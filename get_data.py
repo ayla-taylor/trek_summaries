@@ -23,12 +23,12 @@ def scrape(url: str, seasons: int, voy=False) -> pd.DataFrame:
     if voy:
         dfs = dfs[:2] + dfs[4:]
     for df in dfs:
-        # print(df)
         yield df_change(df)
 
 
 def main():
-    filename = 'most_st_wikipages.txt'
+    filename = 'data/most_st_wikipages.txt'
+    # this page has the columns in a different order than all the others, but it is the only one, so I just made an exception
     problem_url = 'https://en.wikipedia.org/wiki/List_of_Star_Trek:_Voyager_episodes'
     # scrape(url, 7, True)
     scraped = []
@@ -39,13 +39,10 @@ def main():
             print("scraping:", url)
             scraped.append(pd.concat(list(scrape(url, int(season), voy))))
     all_summaries = pd.concat(scraped)
-    # print(all_summaries)
-    outfile = 'star_trek_episode_summaries.csv'
+    outfile = 'data/star_trek_episode_summaries.csv'
     print('Writing to', outfile, "...")
     all_summaries.to_csv(outfile, index=False)
     print('done')
-    # for x in scraped:
-    #     print(x)
 
 
 if __name__ == '__main__':
