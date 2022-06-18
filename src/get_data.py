@@ -27,7 +27,7 @@ def scrape(url: str, seasons: int, voy=False) -> pd.DataFrame:
 
 
 def main():
-    filename = 'data/most_st_wikipages.txt'
+    filename = '../data/most_st_wikipages.txt'
     # this page has the columns in a different order than all the others, but it is the only one, so I just made an exception
     problem_url = 'https://en.wikipedia.org/wiki/List_of_Star_Trek:_Voyager_episodes'
     # scrape(url, 7, True)

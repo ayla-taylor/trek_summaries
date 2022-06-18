@@ -7,7 +7,7 @@ import tqdm
 import stanza
 
 
-DATA_DIR = './data'
+DATA_DIR = '../data'
 NLP = stanza.Pipeline(lang='en', processors='tokenize', tokenize_no_ssplit=True)
 
 # Hyperparameters
@@ -35,7 +35,7 @@ def process_sent(sent, lower=False, reverse=False):
 
 def prepare_data():
     os.makedirs(DATA_DIR, exist_ok=True)
-    file = 'data/star_trek_episode_summaries.csv'
+    file = '../data/star_trek_episode_summaries.csv'
     summaries = []
     with open(file, encoding='utf8') as f:
         for line in f:

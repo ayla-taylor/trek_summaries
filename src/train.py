@@ -1,12 +1,8 @@
-import os
 import time
 
 import torch
-import torch.nn as nn
-import torch.optim as optim
-from tqdm import tqdm
 
-from data import prepare_data
+from trek_summaries.src.data import prepare_data
 
 
 def train():
