@@ -2,6 +2,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+
+
+
 class Decoder(nn.Module):
 
     def __init__(self, vocab: dict, embed_dim: int, hidden_dim: int, num_layers: int, dropout: int, bidirectional: bool):
@@ -13,7 +16,7 @@ class Decoder(nn.Module):
         self.rnn = nn.LSTM(embed_dim, hidden_dim, num_layers, batch_first=True, bidirectional=bidirectional)
         self.dense = nn.Linear(hidden_dim, vocab_size)
 
-        self.reset_parameters(self)
+        self.reset_parameters()
 
     def reset_parameters(self):
         for name, param in self.rnn.named_parameters():
