@@ -29,12 +29,12 @@ def train(dataset, model, tokenizer) -> None:
 
 
 def tokenize_data(filename: str, tokenizer: GPT2Tokenizer) -> Any:
-    summary_list = []
+    summary_long_string = ''
     with open(filename, 'r', encoding='utf8') as f:
         for line in f:
-            summary_list.append(line.strip().strip(','))
+            summary_long_string += line.strip().strip(',') + '<|endoftext|>'
     # average_len = int(sum([len(x) for x in summary_list])/len(summary_list))  # get average length of summary
-    inputs = tokenizer(summary_list)
+    inputs = tokenizer(summary_long_string, return_tensors="pt")
     return inputs
 
 
