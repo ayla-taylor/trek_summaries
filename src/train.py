@@ -2,7 +2,7 @@ import time
 
 import torch
 
-from trek_summaries.src.data_utils import prepare_data
+from src.data_utils import prepare_data
 
 
 def train():
