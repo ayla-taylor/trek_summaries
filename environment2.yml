@@ -1,4 +1,4 @@
-name: base
+name: trek_summaries
 channels:
   - conda-forge
   - defaults
@@ -13,7 +13,6 @@ dependencies:
   - certifi=2021.10.8=py39hcbf5309_1
   - cffi=1.14.6=py39h2bbff1b_0
   - charset-normalizer=2.0.4=pyhd3eb1b0_0
-  - conda=4.11.0=py39hcbf5309_0
   - conda-package-handling=1.7.3=py39h8cc25b3_1
   - conllu=4.4.1=pyhd3eb1b0_0
   - console_shortcut=0.1.1=4
@@ -262,4 +261,4 @@ dependencies:
     - xxhash==3.0.0
     - yarl==1.7.2
     - zipp==3.6.0
-prefix: C:\Users\aylat\miniconda3
+prefix: C:\Users\aylat\miniconda3\envs\trek_summaries
