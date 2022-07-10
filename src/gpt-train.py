@@ -2,6 +2,7 @@ import random
 from typing import Any
 
 import torch
+import numpy as np
 from transformers import GPT2Tokenizer, GPT2LMHeadModel, Trainer, TrainingArguments
 from datasets import load_metric, load_dataset
 
@@ -29,11 +30,15 @@ class Dataset(torch.utils.data.Dataset):
 def train(dataset, val_dataset, model, tokenizer) -> None:
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-    metric = load_metric('bleu')
+    def compute_metrics(eval_preds):
+        metric = load_metric("bleu")
+        logits, labels = eval_preds
+        predictions = np.argmax(logits, axis=-1)
+        return metric.compute(predictions=predictions, references=labels)
 
     args = TrainingArguments(
         output_dir='./model/trek_summary_gpt2',
-        # evaluation_strategy='epoch',
+        evaluation_strategy='epoch',
         num_train_epochs=5,
         learning_rate=0.005
     )
@@ -42,16 +47,16 @@ def train(dataset, val_dataset, model, tokenizer) -> None:
         model=model,
         tokenizer=tokenizer,
         train_dataset=dataset,
-        # eval_dataset=val_dataset,
+        eval_dataset=val_dataset,
         args=args,
-        # compute_metrics=metric,
+        compute_metrics=compute_metrics,
         data_collator=lambda data: {'input_ids': torch.stack([f[0] for f in data]),
                                     'attention_mask': torch.stack([f[1] for f in data]),
                                     'labels': torch.stack([f[0] for f in data])}
     )
 
     trainer.train()
-    # trainer.evaluate()
+    trainer.evaluate()
 
 
 def make_dataset(filename: str, tokenizer: GPT2Tokenizer) -> Any:
