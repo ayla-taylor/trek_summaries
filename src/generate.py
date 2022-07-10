@@ -1,13 +1,13 @@
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 import torch
 
-model_dir = '../model/StarTrekSummary_Model'
+model_dir = './model/trek_summary_gpt2'
 model = GPT2LMHeadModel.from_pretrained(model_dir)
-tokenizer = GPT2Tokenizer.from_pretrained(model_dir)
+tokenizer = GPT2Tokenizer.from_pretrained(model_dir, local_files_only=True)
 
 model.eval()
 
-prompt = "<bos>"
+prompt = "<|startofstring|>"
 
 generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
 

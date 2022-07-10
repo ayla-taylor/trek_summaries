@@ -30,15 +30,15 @@ class Dataset(torch.utils.data.Dataset):
 def train(dataset, val_dataset, model, tokenizer) -> None:
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-    def compute_metrics(eval_preds):
-        metric = load_metric("bleu")
-        logits, labels = eval_preds
-        predictions = np.argmax(logits, axis=-1)
-        return metric.compute(predictions=predictions, references=labels)
+    # def compute_metrics(eval_preds):
+    #     metric = load_metric("bleu")
+    #     # logits, labels = eval_preds
+    #     # predictions = np.argmax(logits, axis=-1)
+    #     return metric.compute(predictions=eval_preds, smooth_method='floor')
 
     args = TrainingArguments(
         output_dir='./model/trek_summary_gpt2',
-        evaluation_strategy='epoch',
+        # evaluation_strategy='epoch',
         num_train_epochs=5,
         learning_rate=0.005
     )
@@ -47,16 +47,16 @@ def train(dataset, val_dataset, model, tokenizer) -> None:
         model=model,
         tokenizer=tokenizer,
         train_dataset=dataset,
-        eval_dataset=val_dataset,
+        # eval_dataset=val_dataset,
         args=args,
-        compute_metrics=compute_metrics,
+        # compute_metrics=compute_metrics,
         data_collator=lambda data: {'input_ids': torch.stack([f[0] for f in data]),
                                     'attention_mask': torch.stack([f[1] for f in data]),
                                     'labels': torch.stack([f[0] for f in data])}
     )
 
     trainer.train()
-    trainer.evaluate()
+    trainer.save_model()
 
 
 def make_dataset(filename: str, tokenizer: GPT2Tokenizer) -> Any:
