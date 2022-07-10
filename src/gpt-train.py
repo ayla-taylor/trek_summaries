@@ -5,7 +5,7 @@ import torch
 from transformers import GPT2Tokenizer, GPT2LMHeadModel, Trainer, TrainingArguments
 from datasets import load_metric, load_dataset
 
-import src.data_utils
+# import src.data_utils
 
 
 class Dataset(torch.utils.data.Dataset):
