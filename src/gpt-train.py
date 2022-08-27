@@ -4,9 +4,6 @@ from typing import Any
 import torch
 import numpy as np
 from transformers import GPT2Tokenizer, GPT2LMHeadModel, Trainer, TrainingArguments
-from datasets import load_metric, load_dataset
-
-# import src.data_utils
 
 
 class Dataset(torch.utils.data.Dataset):
@@ -27,7 +24,7 @@ class Dataset(torch.utils.data.Dataset):
         return self.input_ids[idx], self.attn_masks[idx]
 
 
-def train(dataset, val_dataset, model, tokenizer) -> None:
+def train(dataset, model, tokenizer) -> None:
     device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
     # def compute_metrics(eval_preds):
@@ -38,25 +35,24 @@ def train(dataset, val_dataset, model, tokenizer) -> None:
 
     args = TrainingArguments(
         output_dir='./model/trek_summary_gpt2',
-        # evaluation_strategy='epoch',
         num_train_epochs=5,
-        learning_rate=0.005
+        learning_rate=0.005,
     )
 
     trainer = Trainer(
         model=model,
         tokenizer=tokenizer,
         train_dataset=dataset,
-        # eval_dataset=val_dataset,
         args=args,
-        # compute_metrics=compute_metrics,
         data_collator=lambda data: {'input_ids': torch.stack([f[0] for f in data]),
                                     'attention_mask': torch.stack([f[1] for f in data]),
-                                    'labels': torch.stack([f[0] for f in data])}
+                                    # 'labels': torch.stack([f[0] for f in data])}
+                                    }
     )
 
     trainer.train()
     trainer.save_model()
+    trainer.model.generate()
 
 
 def make_dataset(filename: str, tokenizer: GPT2Tokenizer) -> Any:
@@ -66,21 +62,26 @@ def make_dataset(filename: str, tokenizer: GPT2Tokenizer) -> Any:
         for line in f:
             data_list.append(line.strip())
             total_len += len(line.strip())
-    max_len = int(total_len/len(data_list)) + 100  # making the max length a bit longer than average because that seems right
+    max_len = int(total_len/len(data_list)) + 5  # making the max length a bit longer than average because that seems right
     random.shuffle(data_list)
+    data_dict = tokenizer('<|startoftext|>' + data_list[0] + '<|endoftext|>', truncation=True, max_length=max_len,
+                          padding='max_length')
 
+    print(data_dict)
+    print(tokenizer.decode(data_dict['input_ids']))
     dataset = Dataset(data_list, tokenizer, max_len)
-    train_dataset = dataset[:int(0.9 * len(dataset))]
-    val_dataset = dataset[int(0.9 * len(dataset)):]
-
-    return train_dataset, val_dataset
+    # train_dataset = dataset[:int(0.9 * len(dataset))]
+    # val_dataset = dataset[int(0.9 * len(dataset)):]
+    # print(ty)
+    # print(tokenizer.decode(dataset[:3]))
+    return dataset
 
 
 def main():
 
-    def tokenize(batch) -> Any:
-        inputs = tokenizer(batch['Summaries'], padding=True)
-        return inputs
+    # def tokenize(batch) -> Any:
+    #     inputs = tokenizer(batch['Summaries'], padding=True)
+    #     return inputs
 
     filename = './data/star_trek_episode_summaries.csv'
 
@@ -89,7 +90,7 @@ def main():
                                   'bos_token': '<|startoftext|>',
                                   'eos_token': '<|endoftext|>'})
 
-    train_dataset, val_dataset = make_dataset(filename, tokenizer)
+    train_dataset= make_dataset(filename, tokenizer)
 
     model = GPT2LMHeadModel.from_pretrained('gpt2')
     model.resize_token_embeddings(len(tokenizer))
@@ -99,7 +100,7 @@ def main():
     # train_dataset = summary_split['train'].map(tokenize, batched=True)
     # val_dataset = summary_split['test'].map(tokenize, batched=True)
 
-    train(train_dataset, val_dataset, model, tokenizer)
+    train(train_dataset, model, tokenizer)
 
 
 if __name__ == '__main__':
